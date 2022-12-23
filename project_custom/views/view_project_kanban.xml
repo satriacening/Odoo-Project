@@ -1,0 +1,28 @@
+<odoo>
+    <record id="view_create_project_inherit" model="ir.ui.view">
+        <field name="name">view.create.project.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.project_project_view_form_simplified"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/field[@name='user_id']" position="attributes">
+                <attribute name="invisible">0</attribute>
+            </xpath>
+            <xpath expr="//div" position="inside">
+                <label for="user_id" class="oe_inline mt-4" string="Project Manager"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_project_kanban_inherit" model="ir.ui.view">
+        <field name="name">view.project.kanban.inherit</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.view_project_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//templates/t/div/div" position="after">
+                <span class="col-lg-6 ps-lg-0">
+                    <field name="progress" widget="progressbar" />
+                </span>
+            </xpath>
+        </field>
+    </record>
+</odoo>
