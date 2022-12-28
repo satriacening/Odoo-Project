@@ -37,6 +37,9 @@ class Task(models.Model):
     reviewer = fields.Many2one('res.users', string="Reviewer")
     check_user = fields.Boolean(compute='_compute_check')
 
+    def _compute_bridge(self):
+        self.bridge = self.progress
+
     @api.depends('sub_tasks.duration')
     def _compute_real_planned(self):
         for sheet in self:
@@ -55,20 +58,23 @@ class Task(models.Model):
                 self.duration = day[0:x]
 
     def _compute_progress(self):
-        query = """
-        SELECT sum(duration) FROM project_sub_task where done = TRUE and sub_id = (%s)
-        """ % self.id
-        self.env.cr.execute(query)
-        val = self.env.cr.fetchone()
-        if val[0] != None:
-            result = (val[0] / self.real_planned) * 100
-            self.progress = result
-        else:
-            self.progress = 0
+        # this is the finishedcode
+        for i in self:
+            query = """
+            SELECT sum(duration) FROM project_sub_task where done = TRUE and sub_id = (%s)
+            """ % i.id
+            i.env.cr.execute(query)
+            val = i.env.cr.fetchone()
+
+            if val[0] != None:
+                result = (val[0] / i.real_planned) * 100
+                i.progress = result
+            else:
+                i.progress = 0
 
     @api.onchange('date_deadline')
     def _onchange_deadline(self):
-        if self.date_deadline:
+        if self.date_deadline and not self.start_date:
             self.start_date = date.today()
             return {
                 'warning': {

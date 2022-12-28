@@ -21,6 +21,7 @@
         'security/ir.model.access.csv',
         'views/view_project_kanban.xml',
         'views/view_task_form2.xml',
+        'views/view_task_kanban.xml',
     ],
     'installable': True,
     'auto_install': False,
