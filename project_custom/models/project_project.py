@@ -14,5 +14,9 @@ class Project(models.Model):
             print(i.duration, ' ini dia')
 
     def _compute_progress(self):
+        # (total progress task in project) : (total task)
         for sheet in self:
-            sheet.progress = (sum(sheet.tasks.mapped('progress'))) / (sheet.env['project.task'].search_count([('project_id', '=', sheet.id)]))
+            if sheet.env['project.task'].search_count([('project_id', '=', sheet.id)]) == 0:
+                sheet.progress = 0
+            else:
+                sheet.progress = (sum(sheet.tasks.mapped('progress'))) / (sheet.env['project.task'].search_count([('project_id', '=', sheet.id)]))
