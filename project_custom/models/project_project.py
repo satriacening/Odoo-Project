@@ -1,5 +1,8 @@
 from odoo import fields, api, models
 
+from datetime import date
+import datetime
+
 
 class Project(models.Model):
     _inherit = 'project.project'
@@ -11,7 +14,6 @@ class Project(models.Model):
     def _compute_duration(self):
         for i in self:
             i.duration = i.date - i.date_start
-            print(i.duration, ' ini dia')
 
     def _compute_progress(self):
         # (total progress task in project) : (total task)

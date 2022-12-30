@@ -1,7 +1,9 @@
 from odoo import api, fields, models, _
 import datetime
 from odoo.exceptions import UserError, ValidationError, Warning
-from datetime import datetime, date
+from datetime import date
+from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+from lxml import etree
 
 
 class Task(models.Model):
@@ -47,15 +49,16 @@ class Task(models.Model):
 
     @api.depends('date_deadline', 'duration')
     def _compute_duration(self):
-        if self.start_date and self.date_deadline:
-            self.duration = self.date_deadline - self.start_date
-        if self.duration:
-            if self.duration.find(",") == -1:
-                self.duration = "0"
-            else:
-                day = self.duration
-                x = day.index(",")
-                self.duration = day[0:x]
+        for i in self:
+            if i.start_date and i.date_deadline:
+                i.duration = i.date_deadline - i.start_date
+            if i.duration:
+                if i.duration.find(",") == -1:
+                    i.duration = "0"
+                else:
+                    day = i.duration
+                    x = day.index(",")
+                    i.duration = day[0:x]
 
     def _compute_progress(self):
         # this is the finishedcode
@@ -82,6 +85,22 @@ class Task(models.Model):
                     'message': _('You have not specified "Start Date", "Start Date" will be filled with the current Date'),
                 },
             }
+
+    # @api.model
+    # def get_view(self, view_id=None, view_type='form', **options):
+        # res = super().get_view(view_id, view_type, **options)
+        # print('this is', fields.Date.today())
+        # max_date = (fields.Date.today() + datetime.timedelta(seconds=1)).strftime(DEFAULT_SERVER_DATE_FORMAT) # avoid error
+        #
+        # if view_type == 'form':
+        #     print('masuk', res)
+        #     doc = etree.XML(res['arch'])
+        #     print('doc', doc)
+        #     node = doc.xpath("//fields[@name='date']")
+        #     node.set('options', "{'datepicker': {'maxDate': '%s'}}" % max_date)
+        # #     res['arch'] = etree.tostring(doc)
+        # return res
+
 
     # ===== uncomment this code if you activate this feature
     # ===== the feature gives a popup warning when user doesn't have access
